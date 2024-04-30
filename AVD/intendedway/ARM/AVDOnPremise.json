@@ -1,0 +1,880 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.26.170.59819",
+      "templateHash": "14883787111166388465"
+    }
+  },
+  "parameters": {
+    "currentDate": {
+      "type": "string",
+      "defaultValue": "[utcNow('dd-MM-yyyy_HH_mm')]"
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]"
+    },
+    "administratorAccountPassword": {
+      "type": "securestring"
+    },
+    "administratorAccountUsername": {
+      "type": "string"
+    },
+    "domain": {
+      "type": "string"
+    },
+    "oUPath": {
+      "type": "string"
+    },
+    "logicalNetworkId": {
+      "type": "string"
+    },
+    "hostpoolName": {
+      "type": "string",
+      "defaultValue": "HP1"
+    },
+    "hostPoolRG": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().name]"
+    },
+    "principalID": {
+      "type": "string"
+    },
+    "workspaceName": {
+      "type": "string",
+      "defaultValue": "[format('{0}-WS', parameters('hostpoolName'))]"
+    },
+    "workspaceFriendlyName": {
+      "type": "string",
+      "defaultValue": "[format('Cloud Workspace for {0}', parameters('hostpoolName'))]"
+    },
+    "configurationZipUri": {
+      "type": "string"
+    },
+    "customLocationId": {
+      "type": "string"
+    },
+    "domainAdministratorPassword": {
+      "type": "securestring"
+    },
+    "domainAdministratorUsername": {
+      "type": "string"
+    },
+    "fileUri": {
+      "type": "string"
+    },
+    "imageId": {
+      "type": "string"
+    },
+    "memoryMB": {
+      "type": "int"
+    },
+    "virtualProcessorCount": {
+      "type": "int"
+    },
+    "vmInstanceSuffixes": {
+      "type": "array",
+      "defaultValue": [
+        "0",
+        "1"
+      ]
+    },
+    "tagValues": {
+      "type": "object",
+      "defaultValue": {
+        "CreatedBy": "BICEPDeployment",
+        "deploymentDate": "[parameters('currentDate')]",
+        "Environment": "PoC",
+        "Service": "AVD"
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('hostpool{0}', parameters('currentDate'))]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "tagValues": {
+            "value": "[parameters('tagValues')]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "hostpoolName": {
+            "value": "[parameters('hostpoolName')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.26.170.59819",
+              "templateHash": "11678962274007668465"
+            }
+          },
+          "parameters": {
+            "hostpoolName": {
+              "type": "string",
+              "metadata": {
+                "description": "The name of the hostpool"
+              }
+            },
+            "location": {
+              "type": "string",
+              "defaultValue": "[resourceGroup().location]",
+              "metadata": {
+                "description": "Location for all resources to be created in."
+              }
+            },
+            "tagValues": {
+              "type": "object",
+              "defaultValue": {
+                "creator": "bfrank",
+                "env": "avdPoc"
+              },
+              "metadata": {
+                "description": "The tags to be assigned to the resources"
+              }
+            },
+            "tokenExpirationTime": {
+              "type": "string",
+              "defaultValue": "[dateTimeAdd(utcNow('yyyy-MM-dd T00:00:00'), 'P1D', 'o')]"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.DesktopVirtualization/hostPools",
+              "apiVersion": "2021-02-01-preview",
+              "name": "[parameters('hostpoolName')]",
+              "location": "[parameters('location')]",
+              "tags": "[parameters('tagValues')]",
+              "properties": {
+                "hostPoolType": "Pooled",
+                "loadBalancerType": "BreadthFirst",
+                "maxSessionLimit": 5,
+                "description": "first avd host pool",
+                "friendlyName": "friendly name",
+                "preferredAppGroupType": "Desktop",
+                "registrationInfo": {
+                  "expirationTime": "[parameters('tokenExpirationTime')]",
+                  "registrationTokenOperation": "Update"
+                }
+              }
+            }
+          ],
+          "outputs": {
+            "registrationInfoToken": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.DesktopVirtualization/hostPools', parameters('hostpoolName'))).registrationInfo.token]"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('hostpoolgalleryvm{0}', parameters('currentDate'))]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "tagValues": {
+            "value": "[parameters('tagValues')]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "vmAdministratorAccountUsername": {
+            "value": "[parameters('administratorAccountPassword')]"
+          },
+          "vmAdministratorAccountPassword": {
+            "value": "[parameters('administratorAccountUsername')]"
+          },
+          "domain": {
+            "value": "[parameters('domain')]"
+          },
+          "hostpoolName": {
+            "value": "[parameters('hostpoolName')]"
+          },
+          "hostpoolToken": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', format('hostpool{0}', parameters('currentDate'))), '2022-09-01').outputs.registrationInfoToken.value]"
+          },
+          "oUPath": {
+            "value": "[parameters('oUPath')]"
+          },
+          "logicalNetworkId": {
+            "value": "[parameters('logicalNetworkId')]"
+          },
+          "rdshPrefix": {
+            "value": "[format('{0}-vm', parameters('hostpoolName'))]"
+          },
+          "vmInstanceSuffixes": {
+            "value": "[parameters('vmInstanceSuffixes')]"
+          },
+          "configurationZipUri": {
+            "value": "[parameters('configurationZipUri')]"
+          },
+          "customLocationId": {
+            "value": "[parameters('customLocationId')]"
+          },
+          "domainAdministratorPassword": {
+            "value": "[parameters('domainAdministratorPassword')]"
+          },
+          "domainAdministratorUsername": {
+            "value": "[parameters('domainAdministratorUsername')]"
+          },
+          "fileUri": {
+            "value": "[parameters('fileUri')]"
+          },
+          "imageId": {
+            "value": "[parameters('imageId')]"
+          },
+          "memoryMB": {
+            "value": "[parameters('memoryMB')]"
+          },
+          "virtualProcessorCount": {
+            "value": "[parameters('virtualProcessorCount')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.26.170.59819",
+              "templateHash": "10720719372729199043"
+            }
+          },
+          "parameters": {
+            "rdshPrefix": {
+              "type": "string",
+              "defaultValue": "[take(toLower(resourceGroup().name), 10)]",
+              "metadata": {
+                "description": "This prefix will be used in combination with the VM number to create the VM name. This value includes the dash, so if using “rdsh” as the prefix, VMs would be named “rdsh-0”, “rdsh-1”, etc. You should use a unique prefix to reduce name collisions in Active Directory."
+              }
+            },
+            "virtualProcessorCount": {
+              "type": "int",
+              "metadata": {
+                "description": "Virtual Processor Count"
+              }
+            },
+            "memoryMB": {
+              "type": "int",
+              "metadata": {
+                "description": "The total amount of memory in megabytes"
+              }
+            },
+            "maximumMemoryMB": {
+              "type": "int",
+              "defaultValue": 0,
+              "metadata": {
+                "description": "This parameter is optional and only used if dynamicMemory = true. When using dynamic memory this setting is the maximum MB given to the VM."
+              }
+            },
+            "minimumMemoryMB": {
+              "type": "int",
+              "defaultValue": 0,
+              "metadata": {
+                "description": "This parameter is optional and only used if dynamicMemory = true. When using dynamic memory this setting is the minimum MB given to the VM."
+              }
+            },
+            "dynamicMemoryConfig": {
+              "type": "bool",
+              "defaultValue": false,
+              "metadata": {
+                "description": "True if you want to use a dynamic memory config."
+              }
+            },
+            "targetMemoryBuffer": {
+              "type": "int",
+              "defaultValue": 0,
+              "metadata": {
+                "description": "This parameter is optional and only used if dynamicMemory = true. When using dynamic memory this setting is the buffer of extra memory given to the VM."
+              }
+            },
+            "vmInstanceSuffixes": {
+              "type": "array",
+              "defaultValue": [
+                "0",
+                "1"
+              ],
+              "metadata": {
+                "description": "This is the suffix to the vm names. VM will be named '[vmPrefix]-[vmInstanceSuffixes]'"
+              }
+            },
+            "tagValues": {
+              "type": "object",
+              "defaultValue": {},
+              "metadata": {
+                "description": "The tags to be assigned to the resources"
+              }
+            },
+            "location": {
+              "type": "string",
+              "metadata": {
+                "description": "The location where the resources will be deployed."
+              }
+            },
+            "customLocationId": {
+              "type": "string",
+              "metadata": {
+                "description": "A deployment target created and customized by your organization for creating virtual machines. The custom location is associated to an Azure Stack HCI cluster."
+              }
+            },
+            "domainAdministratorUsername": {
+              "type": "string",
+              "metadata": {
+                "description": "The username for the domain admin."
+              }
+            },
+            "domainAdministratorPassword": {
+              "type": "securestring",
+              "metadata": {
+                "description": "The password that corresponds to the existing domain username."
+              }
+            },
+            "vmAdministratorAccountUsername": {
+              "type": "string",
+              "defaultValue": "",
+              "metadata": {
+                "description": "A username to be used as the virtual machine administrator account. The vmAdministratorAccountUsername and  vmAdministratorAccountPassword parameters must both be provided. Otherwise, domain administrator credentials provided by domainAdministratorUsername and domainAdministratorPassword will be used."
+              }
+            },
+            "vmAdministratorAccountPassword": {
+              "type": "securestring",
+              "defaultValue": "",
+              "metadata": {
+                "description": "The password associated with the virtual machine administrator account. The vmAdministratorAccountUsername and  vmAdministratorAccountPassword parameters must both be provided. Otherwise, domain administrator credentials provided by domainAdministratorUsername and domainAdministratorPassword will be used."
+              }
+            },
+            "logicalNetworkId": {
+              "type": "string",
+              "metadata": {
+                "description": "Full ARM resource ID of the AzureStackHCI virtual network used for the VMs."
+              }
+            },
+            "imageId": {
+              "type": "string",
+              "metadata": {
+                "description": "Full ARM resource ID of the AzureStackHCI virtual machine image used for the VMs."
+              }
+            },
+            "hostpoolName": {
+              "type": "string",
+              "metadata": {
+                "description": "The name of the hostpool"
+              }
+            },
+            "hostpoolToken": {
+              "type": "string",
+              "metadata": {
+                "description": "The token for adding VMs to the hostpool"
+              }
+            },
+            "oUPath": {
+              "type": "string",
+              "metadata": {
+                "description": "OU Path for the domain join"
+              }
+            },
+            "domain": {
+              "type": "string",
+              "metadata": {
+                "description": "Domain to join"
+              }
+            },
+            "fileUri": {
+              "type": "string",
+              "metadata": {
+                "description": "Uri to download file that is executed in the custom script extension"
+              }
+            },
+            "fileName": {
+              "type": "string",
+              "defaultValue": "HciCustomScript.ps1",
+              "metadata": {
+                "description": "Uri to download file that is executed in the custom script extension"
+              }
+            },
+            "configurationZipUri": {
+              "type": "string",
+              "metadata": {
+                "description": "The base URI where the Configuration.zip script is located to install the AVD agent on the VM"
+              }
+            },
+            "aadJoin": {
+              "type": "bool",
+              "defaultValue": false,
+              "metadata": {
+                "description": "IMPORTANT: You can use this parameter for the test purpose only as AAD Join is public preview. True if AAD Join, false if AD join"
+              }
+            },
+            "intune": {
+              "type": "bool",
+              "defaultValue": false,
+              "metadata": {
+                "description": "IMPORTANT: Please don't use this parameter as intune enrollment is not supported yet. True if intune enrollment is selected.  False otherwise"
+              }
+            },
+            "systemData": {
+              "type": "object",
+              "defaultValue": {},
+              "metadata": {
+                "description": "System data is used for internal purposes, such as support preview features."
+              }
+            }
+          },
+          "variables": {
+            "domain_var": "[if(equals(parameters('domain'), ''), last(split(parameters('domainAdministratorUsername'), '@')), parameters('domain'))]",
+            "hostPoolNameArgument": "[format('-HostPoolName {0}', parameters('hostpoolName'))]",
+            "registrationTokenArgument": "[format(' -RegistrationInfoToken  {0}', parameters('hostpoolToken'))]",
+            "artifactUriArgument": "[format(' -ArtifactUri {0}', parameters('configurationZipUri'))]",
+            "customScriptParentFolder": "[split(parameters('fileUri'), '/')[4]]",
+            "customScriptFilePath": "[format('{0}/{1}', variables('customScriptParentFolder'), parameters('fileName'))]",
+            "arguments": "[format('{0}{1}{2}', variables('hostPoolNameArgument'), variables('registrationTokenArgument'), variables('artifactUriArgument'))]",
+            "isVMAdminAccountCredentialsProvided": "[and(not(equals(parameters('vmAdministratorAccountUsername'), '')), not(equals(parameters('vmAdministratorAccountPassword'), '')))]",
+            "vmAdministratorUsername": "[if(variables('isVMAdminAccountCredentialsProvided'), parameters('vmAdministratorAccountUsername'), first(split(parameters('domainAdministratorUsername'), '@')))]",
+            "vmAdministratorPassword": "[if(variables('isVMAdminAccountCredentialsProvided'), parameters('vmAdministratorAccountPassword'), parameters('domainAdministratorPassword'))]"
+          },
+          "resources": [
+            {
+              "copy": {
+                "name": "rdshPrefix_vmInitialNumber_nic",
+                "count": "[length(parameters('vmInstanceSuffixes'))]"
+              },
+              "type": "Microsoft.AzureStackHCI/networkInterfaces",
+              "apiVersion": "2023-09-01-preview",
+              "name": "[format('{0}{1}-nic', parameters('rdshPrefix'), parameters('vmInstanceSuffixes')[copyIndex()])]",
+              "location": "[parameters('location')]",
+              "extendedLocation": {
+                "type": "CustomLocation",
+                "name": "[parameters('customLocationId')]"
+              },
+              "tags": "[parameters('tagValues')]",
+              "properties": {
+                "ipConfigurations": [
+                  {
+                    "name": "[format('{0}{1}-nic', parameters('rdshPrefix'), parameters('vmInstanceSuffixes')[copyIndex()])]",
+                    "properties": {
+                      "subnet": {
+                        "id": "[parameters('logicalNetworkId')]"
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "copy": {
+                "name": "rdshPrefix_vmInitialNumber",
+                "count": "[length(parameters('vmInstanceSuffixes'))]"
+              },
+              "type": "Microsoft.HybridCompute/machines",
+              "apiVersion": "2023-03-15-preview",
+              "name": "[format('{0}{1}', parameters('rdshPrefix'), parameters('vmInstanceSuffixes')[copyIndex()])]",
+              "location": "[parameters('location')]",
+              "kind": "HCI",
+              "tags": "[parameters('tagValues')]",
+              "identity": {
+                "type": "SystemAssigned"
+              }
+            },
+            {
+              "copy": {
+                "name": "default",
+                "count": "[length(parameters('vmInstanceSuffixes'))]"
+              },
+              "scope": "[concat('Microsoft.HybridCompute/machines', '/', concat(parameters('rdshPrefix'), parameters('vmInstanceSuffixes')[copyIndex()]))]",
+              "type": "Microsoft.AzureStackHCI/virtualMachineInstances",
+              "apiVersion": "2023-09-01-preview",
+              "name": "default",
+              "extendedLocation": {
+                "type": "CustomLocation",
+                "name": "[parameters('customLocationId')]"
+              },
+              "properties": {
+                "hardwareProfile": {
+                  "vmSize": "Custom",
+                  "processors": "[parameters('virtualProcessorCount')]",
+                  "memoryMB": "[parameters('memoryMB')]",
+                  "dynamicMemoryConfig": "[if(parameters('dynamicMemoryConfig'), createObject('maximumMemoryMB', parameters('maximumMemoryMB'), 'minimumMemoryMB', parameters('minimumMemoryMB'), 'targetMemoryBuffer', parameters('targetMemoryBuffer')), json('null'))]"
+                },
+                "osProfile": {
+                  "adminUsername": "[variables('vmAdministratorUsername')]",
+                  "adminPassword": "[variables('vmAdministratorPassword')]",
+                  "windowsConfiguration": {
+                    "provisionVMAgent": true,
+                    "provisionVMConfigAgent": true
+                  },
+                  "computerName": "[format('{0}{1}', parameters('rdshPrefix'), parameters('vmInstanceSuffixes')[copyIndex()])]"
+                },
+                "storageProfile": {
+                  "imageReference": {
+                    "id": "[parameters('imageId')]"
+                  }
+                },
+                "networkProfile": {
+                  "networkInterfaces": [
+                    {
+                      "id": "[resourceId('Microsoft.AzureStackHCI/networkinterfaces', format('{0}{1}-nic', parameters('rdshPrefix'), parameters('vmInstanceSuffixes')[copyIndex()]))]"
+                    }
+                  ]
+                }
+              },
+              "dependsOn": [
+                "rdshPrefix_vmInitialNumber",
+                "rdshPrefix_vmInitialNumber_nic"
+              ]
+            },
+            {
+              "copy": {
+                "name": "rdshPrefix_vmInitialNumber_CustomScriptExtension",
+                "count": "[length(parameters('vmInstanceSuffixes'))]"
+              },
+              "type": "Microsoft.HybridCompute/machines/extensions",
+              "apiVersion": "2023-03-15-preview",
+              "name": "[format('{0}{1}/CustomScriptExtension', parameters('rdshPrefix'), parameters('vmInstanceSuffixes')[copyIndex()])]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "publisher": "Microsoft.Compute",
+                "type": "CustomScriptExtension",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                  "fileUris": [
+                    "[parameters('fileUri')]"
+                  ]
+                },
+                "protectedSettings": {
+                  "commandToExecute": "[format('powershell -ExecutionPolicy Unrestricted -File {0} {1}', variables('customScriptFilePath'), variables('arguments'))]"
+                }
+              },
+              "dependsOn": [
+                "default"
+              ]
+            },
+            {
+              "copy": {
+                "name": "rdshPrefix_vmInitialNumber_AADLoginForWindows",
+                "count": "[length(parameters('vmInstanceSuffixes'))]"
+              },
+              "condition": "[and(parameters('aadJoin'), if(contains(parameters('systemData'), 'aadJoinPreview'), not(parameters('systemData').aadJoinPreview), bool('true')))]",
+              "type": "Microsoft.HybridCompute/machines/extensions",
+              "apiVersion": "2023-03-15-preview",
+              "name": "[format('{0}{1}/AADLoginForWindows', parameters('rdshPrefix'), parameters('vmInstanceSuffixes')[copyIndex()])]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "publisher": "Microsoft.Azure.ActiveDirectory",
+                "type": "AADLoginForWindows",
+                "typeHandlerVersion": "2.0",
+                "autoUpgradeMinorVersion": true,
+                "settings": "[if(parameters('intune'), createObject('mdmId', '0000000a-0000-0000-c000-000000000000'), createObject('mdmId', ''))]"
+              },
+              "dependsOn": [
+                "rdshPrefix_vmInitialNumber_CustomScriptExtension"
+              ]
+            },
+            {
+              "copy": {
+                "name": "rdshPrefix_vmInitialNumber_joindomain",
+                "count": "[length(parameters('vmInstanceSuffixes'))]"
+              },
+              "condition": "[not(parameters('aadJoin'))]",
+              "type": "Microsoft.HybridCompute/machines/extensions",
+              "apiVersion": "2023-03-15-preview",
+              "name": "[format('{0}{1}/joindomain', parameters('rdshPrefix'), parameters('vmInstanceSuffixes')[copyIndex()])]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "publisher": "Microsoft.Compute",
+                "type": "JsonADDomainExtension",
+                "typeHandlerVersion": "1.3",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                  "name": "[variables('domain_var')]",
+                  "oUPath": "[parameters('oUPath')]",
+                  "user": "[parameters('domainAdministratorUsername')]",
+                  "restart": "true",
+                  "options": "3"
+                },
+                "protectedSettings": {
+                  "password": "[parameters('domainAdministratorPassword')]"
+                }
+              },
+              "dependsOn": [
+                "rdshPrefix_vmInitialNumber_CustomScriptExtension"
+              ]
+            },
+            {
+              "copy": {
+                "name": "rdshPrefix_vmInitialNumber_azmonitor",
+                "count": "[length(parameters('vmInstanceSuffixes'))]"
+              },
+              "type": "Microsoft.HybridCompute/machines/extensions",
+              "apiVersion": "2023-03-15-preview",
+              "name": "[format('{0}{1}/azmonitor', parameters('rdshPrefix'), parameters('vmInstanceSuffixes')[copyIndex()])]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "publisher": "Microsoft.Azure.Monitor",
+                "type": "AzureMonitorWindowsAgent",
+                "typeHandlerVersion": "1.5",
+                "autoUpgradeMinorVersion": true
+              },
+              "dependsOn": [
+                "rdshPrefix_vmInitialNumber_joindomain"
+              ]
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', format('hostpool{0}', parameters('currentDate')))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('appgoup{0}', parameters('currentDate'))]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "hostPoolName": {
+            "value": "[parameters('hostpoolName')]"
+          },
+          "hostPoolRG": {
+            "value": "[parameters('hostPoolRG')]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "tagValues": {
+            "value": "[parameters('tagValues')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.26.170.59819",
+              "templateHash": "6260688772357316151"
+            }
+          },
+          "parameters": {
+            "hostPoolName": {
+              "type": "string",
+              "defaultValue": ""
+            },
+            "hostPoolRG": {
+              "type": "string",
+              "defaultValue": "[resourceGroup().name]"
+            },
+            "location": {
+              "type": "string",
+              "defaultValue": "[resourceGroup().location]"
+            },
+            "tagValues": {
+              "type": "object",
+              "defaultValue": {}
+            }
+          },
+          "variables": {
+            "applicationgroupName_var": "[format('{0}-DAG', parameters('hostPoolName'))]",
+            "hostpoolsID": "[format('/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.DesktopVirtualization/hostpools/{2}', subscription().subscriptionId, parameters('hostPoolRG'), parameters('hostPoolName'))]",
+            "friendlyName": "[format('{0} Desktop Application Group', parameters('hostPoolName'))]"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.DesktopVirtualization/applicationGroups",
+              "apiVersion": "2021-02-01-preview",
+              "name": "[variables('applicationgroupName_var')]",
+              "location": "[parameters('location')]",
+              "kind": "Desktop",
+              "tags": "[parameters('tagValues')]",
+              "properties": {
+                "hostPoolArmPath": "[variables('hostpoolsID')]",
+                "description": "Desktop Application Group created through ARM template",
+                "friendlyName": "[variables('friendlyName')]",
+                "applicationGroupType": "Desktop"
+              }
+            }
+          ],
+          "outputs": {
+            "applicationGroupID": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.DesktopVirtualization/applicationGroups', variables('applicationgroupName_var'))]"
+            },
+            "applicationGroupName": {
+              "type": "string",
+              "value": "[variables('applicationgroupName_var')]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', format('hostpool{0}', parameters('currentDate')))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('appgrouprole{0}', parameters('currentDate'))]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "appGroupName": {
+            "value": "[reference(resourceId('Microsoft.Resources/deployments', format('appgoup{0}', parameters('currentDate'))), '2022-09-01').outputs.applicationGroupName.value]"
+          },
+          "principalID": {
+            "value": "[parameters('principalID')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.26.170.59819",
+              "templateHash": "4464768947009734090"
+            }
+          },
+          "parameters": {
+            "principalID": {
+              "type": "string"
+            },
+            "appGroupName": {
+              "type": "string"
+            },
+            "wvdusersrole": {
+              "type": "string",
+              "defaultValue": "[newGuid()]"
+            }
+          },
+          "variables": {
+            "roledefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '1d18fff3-a72a-46b5-b4a9-0b38a3cd7e63')]"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2020-04-01-preview",
+              "scope": "[format('Microsoft.DesktopVirtualization/applicationGroups/{0}', parameters('appGroupName'))]",
+              "name": "[parameters('wvdusersrole')]",
+              "properties": {
+                "roleDefinitionId": "[variables('roledefinitionId')]",
+                "principalId": "[parameters('principalID')]"
+              }
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', format('appgoup{0}', parameters('currentDate')))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('workspace{0}', parameters('currentDate'))]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "applicationGroups": {
+            "value": "[array(reference(resourceId('Microsoft.Resources/deployments', format('appgoup{0}', parameters('currentDate'))), '2022-09-01').outputs.applicationGroupID.value)]"
+          },
+          "tagValues": {
+            "value": "[parameters('tagValues')]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "workspaceName": {
+            "value": "[parameters('workspaceName')]"
+          },
+          "workspaceFriendlyName": {
+            "value": "[parameters('workspaceFriendlyName')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.26.170.59819",
+              "templateHash": "13734568189425707143"
+            }
+          },
+          "parameters": {
+            "workspaceName": {
+              "type": "string",
+              "defaultValue": ""
+            },
+            "tagValues": {
+              "type": "object"
+            },
+            "workspaceFriendlyName": {
+              "type": "string",
+              "defaultValue": "Cloud Workspace"
+            },
+            "applicationGroups": {
+              "type": "array",
+              "defaultValue": [],
+              "metadata": {
+                "description": "description"
+              }
+            },
+            "location": {
+              "type": "string",
+              "defaultValue": "[resourceGroup().location]",
+              "metadata": {
+                "description": "name of your avd workspace"
+              }
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.DesktopVirtualization/workspaces",
+              "apiVersion": "2021-02-01-preview",
+              "name": "[parameters('workspaceName')]",
+              "location": "[parameters('location')]",
+              "tags": "[parameters('tagValues')]",
+              "properties": {
+                "friendlyName": "[parameters('workspaceFriendlyName')]",
+                "applicationGroupReferences": "[parameters('applicationGroups')]"
+              }
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', format('appgoup{0}', parameters('currentDate')))]",
+        "[resourceId('Microsoft.Resources/deployments', format('appgrouprole{0}', parameters('currentDate')))]"
+      ]
+    }
+  ]
+}

@@ -199,10 +199,10 @@
             "value": "[parameters('location')]"
           },
           "vmAdministratorAccountUsername": {
-            "value": "[parameters('administratorAccountPassword')]"
+            "value": "[parameters('administratorAccountUsername')]"
           },
           "vmAdministratorAccountPassword": {
-            "value": "[parameters('administratorAccountUsername')]"
+            "value": "[parameters('administratorAccountPassword')]"
           },
           "domain": {
             "value": "[parameters('domain')]"

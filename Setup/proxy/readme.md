@@ -1,5 +1,8 @@
 # Installing Azure Stack HCI 23h2 with a Proxy
 
+## This is how the environment looks like
+![My HCI Demo Sandbox with a Squid Proxy](proxy.png)
+
 ## Watch it done on YT
 [![Installing Azure Stack HCI 23h2 with a Proxy](https://img.youtube.com/vi/A_zNSNHOKJU/0.jpg)](https://www.youtube.com/watch?v=A_zNSNHOKJU)
 
@@ -12,7 +15,7 @@
 
 
 - [SetProxy.ps1 - PScript sample to do proxy settings on each HCI node prio deployment](SetProxy.ps1)
-- [ArcRegisterWithProxy.ps1 - PScript sample to register HCI node in Azure via a proxy](ArcRegisterWithProxy.ps1) 
+- [ArcRegisterWithProxy.ps1 - PScript sample to register each HCI node in Azure via a proxy](ArcRegisterWithProxy.ps1) 
 
 ## Additional Resources
 - [Configure proxy settings for Azure Stack HCI, version 23H2](https://learn.microsoft.com/en-us/azure-stack/hci/manage/configure-proxy-settings-23h2)

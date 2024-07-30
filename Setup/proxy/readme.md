@@ -4,7 +4,7 @@
 ![My HCI Demo Sandbox with a Squid Proxy](proxy.png)
 
 ## Watch it done on YT
-[![Installing Azure Stack HCI 23h2 with a Proxy](https://img.youtube.com/vi/A_zNSNHOKJU/0.jpg)](https://www.youtube.com/watch?v=A_zNSNHOKJU)
+[![Installing Azure Stack HCI 23h2 with a Proxy](https://img.youtube.com/vi/qRnh5-jelXI/0.jpg)](https://youtu.be/qRnh5-jelXI)
 
 ## Artefacts in this code repo
 - [my Squid proxy log, filtered URL list + deployment steps and timestamps for reference with URLs, DNS, FQDNs being used.](23H2ProxyDeployment_12-07-2024.xlsx)  

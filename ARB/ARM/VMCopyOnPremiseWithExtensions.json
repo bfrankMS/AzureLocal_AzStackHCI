@@ -1,0 +1,291 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vmPrefix": {
+      "type": "string",
+      "defaultValue": "[take(toLower(resourceGroup().name), 10)]",
+      "metadata": {
+        "description": "This prefix will be used in combination with the VM number to create the VM name. This value includes the dash, so if using “rdsh” as the prefix, VMs would be named “rdsh-0”, “rdsh-1”, etc. You should use a unique prefix to reduce name collisions in Active Directory."
+      }
+    },
+    "virtualProcessorCount": {
+      "type": "int",
+      "metadata": {
+        "description": "Virtual Processor Count"
+      }
+    },
+    "memoryMB": {
+      "type": "int",
+      "metadata": {
+        "description": "The total amount of memory in megabytes"
+      }
+    },
+    "maximumMemoryMB": {
+      "type": "int",
+      "defaultValue": 0,
+      "metadata": {
+        "description": "This parameter is optional and only used if dynamicMemory = true. When using dynamic memory this setting is the maximum MB given to the VM."
+      }
+    },
+    "minimumMemoryMB": {
+      "type": "int",
+      "defaultValue": 0,
+      "metadata": {
+        "description": "This parameter is optional and only used if dynamicMemory = true. When using dynamic memory this setting is the minimum MB given to the VM."
+      }
+    },
+    "dynamicMemoryConfig": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "True if you want to use a dynamic memory config."
+      }
+    },
+    "targetMemoryBuffer": {
+      "type": "int",
+      "defaultValue": 0,
+      "metadata": {
+        "description": "This parameter is optional and only used if dynamicMemory = true. When using dynamic memory this setting is the buffer of extra memory given to the VM."
+      }
+    },
+    "vmInstanceSuffixes": {
+      "type": "array",
+      "defaultValue": [
+        "0",
+        "1"
+      ],
+      "metadata": {
+        "description": "This is the suffix to the vm names. VM will be named '[vmPrefix]-[vmInstanceSuffixes]'"
+      }
+    },
+    "tagValues": {
+      "type": "object",
+      "defaultValue": {},
+      "metadata": {
+        "description": "The tags to be assigned to the resources"
+      }
+    },
+    "location": {
+      "type": "string",
+      "metadata": {
+        "description": "The location where the resources will be deployed."
+      }
+    },
+    "customLocationId": {
+      "type": "string",
+      "metadata": {
+        "description": "A deployment target created and customized by your organization for creating virtual machines. The custom location is associated to an Azure Stack HCI cluster."
+      }
+    },
+    "vmAdministratorUsername": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "A username to be used as the virtual machine administrator account. The vmAdministratorAccountUsername and  vmAdministratorAccountPassword parameters must both be provided. Otherwise, domain administrator credentials provided by domainAdministratorUsername and domainAdministratorPassword will be used."
+      }
+    },
+    "vmAdministratorPassword": {
+      "type": "securestring",
+      "defaultValue": "",
+      "metadata": {
+        "description": "The password associated with the virtual machine administrator account. The vmAdministratorAccountUsername and  vmAdministratorAccountPassword parameters must both be provided. Otherwise, domain administrator credentials provided by domainAdministratorUsername and domainAdministratorPassword will be used."
+      }
+    },
+    "logicalNetworkId": {
+      "type": "string",
+      "metadata": {
+        "description": "Full ARM resource ID of the AzureStackHCI virtual network used for the VMs."
+      }
+    },
+    "imageId": {
+      "type": "string",
+      "metadata": {
+        "description": "Full ARM resource ID of the AzureStackHCI virtual machine image used for the VMs."
+      }
+    },
+    "cseURI": {
+      "type": "string",
+      "metadata": {
+        "description": "description"
+      }
+    },
+    "sasToken": {
+      "type": "string",
+      "metadata": {
+        "description": "description"
+      }
+    },
+    "param1": {
+      "type": "string",
+      "defaultValue": "Hello",
+      "metadata": {
+        "description": "description"
+      }
+    },
+    "param2": {
+      "type": "string",
+      "defaultValue": "World",
+      "metadata": {
+        "description": "description"
+      }
+    }
+  },
+  "variables": {},
+  "resources": [
+    {
+      "copy": {
+        "name": "vmPrefix_vmInitialNumber_nic",
+        "count": "[length(parameters('vmInstanceSuffixes'))]"
+      },
+      "type": "Microsoft.AzureStackHCI/networkInterfaces",
+      "apiVersion": "2023-09-01-preview",
+      "name": "[format('{0}{1}-nic', parameters('vmPrefix'), parameters('vmInstanceSuffixes')[copyIndex()])]",
+      "location": "[parameters('location')]",
+      "extendedLocation": {
+        "type": "CustomLocation",
+        "name": "[parameters('customLocationId')]"
+      },
+      "tags": "[parameters('tagValues')]",
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "[format('{0}{1}-nic', parameters('vmPrefix'), parameters('vmInstanceSuffixes')[copyIndex()])]",
+            "properties": {
+              "subnet": {
+                "id": "[parameters('logicalNetworkId')]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "copy": {
+        "name": "vmPrefix_vmInitialNumber",
+        "count": "[length(parameters('vmInstanceSuffixes'))]"
+      },
+      "type": "Microsoft.HybridCompute/machines",
+      "apiVersion": "2023-03-15-preview",
+      "name": "[format('{0}{1}', parameters('vmPrefix'), parameters('vmInstanceSuffixes')[copyIndex()])]",
+      "location": "[parameters('location')]",
+      "kind": "HCI",
+      "tags": "[parameters('tagValues')]",
+      "identity": {
+        "type": "SystemAssigned"
+      }
+    },
+    {
+      "copy": {
+        "name": "default",
+        "count": "[length(parameters('vmInstanceSuffixes'))]"
+      },
+      "scope": "[concat('Microsoft.HybridCompute/machines', '/', concat(parameters('vmPrefix'), parameters('vmInstanceSuffixes')[copyIndex()]))]",
+      "type": "Microsoft.AzureStackHCI/virtualMachineInstances",
+      "apiVersion": "2023-09-01-preview",
+      "name": "default",
+      "extendedLocation": {
+        "type": "CustomLocation",
+        "name": "[parameters('customLocationId')]"
+      },
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "Custom",
+          "processors": "[parameters('virtualProcessorCount')]",
+          "memoryMB": "[parameters('memoryMB')]",
+          "dynamicMemoryConfig": "[if(parameters('dynamicMemoryConfig'), createObject('maximumMemoryMB', parameters('maximumMemoryMB'), 'minimumMemoryMB', parameters('minimumMemoryMB'), 'targetMemoryBuffer', parameters('targetMemoryBuffer')), json('null'))]"
+        },
+        "osProfile": {
+          "adminUsername": "[parameters('vmAdministratorUsername')]",
+          "adminPassword": "[parameters('vmAdministratorPassword')]",
+          "windowsConfiguration": {
+            "provisionVMAgent": true,
+            "provisionVMConfigAgent": true
+          },
+          "computerName": "[format('{0}{1}', parameters('vmPrefix'), parameters('vmInstanceSuffixes')[copyIndex()])]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "id": "[parameters('imageId')]"
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.AzureStackHCI/networkinterfaces', format('{0}{1}-nic', parameters('vmPrefix'), parameters('vmInstanceSuffixes')[copyIndex()]))]"
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "vmPrefix_vmInitialNumber",
+        "vmPrefix_vmInitialNumber_nic"
+      ]
+    },
+    {
+      "copy": {
+        "name": "vmPrefix_vmInitialNumber_runcommand",
+        "count": "[length(parameters('vmInstanceSuffixes'))]"
+      },
+      "type": "Microsoft.HybridCompute/machines/runCommands",
+      "apiVersion": "2023-10-03-preview",
+      "name": "[format('{0}{1}/runCommands', parameters('vmPrefix'), parameters('vmInstanceSuffixes')[copyIndex()])]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "source": {
+          "script": "$cap = Get-WindowsCapability -online -name OpenSSH.Server~~~~0.0.1.0; add-WindowsCapability -online -Name $cap.name ;Start-Service sshd;Set-Service -Name sshd -StartupType Automatic; New-NetFirewallRule -Name OpenSSH-Server-In-TCP -DisplayName OpenSSHServer -Enabled True -Direction Inbound -Protocol TCP -Action Allow -LocalPort 22;"
+        },
+        "timeoutInSeconds": 600,
+        "treatFailureAsDeploymentFailure": false
+      },
+      "dependsOn": [
+        "default"
+      ]
+    },
+    {
+      "copy": {
+        "name": "vmPrefix_vmInitialNumber_customscript",
+        "count": "[length(parameters('vmInstanceSuffixes'))]"
+      },
+      "type": "Microsoft.HybridCompute/machines/extensions",
+      "apiVersion": "2023-03-15-preview",
+      "name": "[format('{0}{1}/CustomScriptExtension', parameters('vmPrefix'), parameters('vmInstanceSuffixes')[copyIndex()])]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "publisher": "Microsoft.Compute",
+        "type": "CustomScriptExtension",
+        "autoUpgradeMinorVersion": true,
+        "settings": {},
+        "protectedSettings": {
+          "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File ',last(split(parameters('cseURI'),'/')), ' ', parameters('param1'), ' ',parameters('param2'))]",
+          "fileUris": [
+            "[concat(parameters('cseURI'),'?',parameters('sasToken'))]"
+          ]
+        }
+      },
+      "dependsOn": [
+        "vmPrefix_vmInitialNumber_runcommand"
+      ]
+    },
+    {
+      "copy": {
+        "name": "vmPrefix_vmInitialNumber_azmonitor",
+        "count": "[length(parameters('vmInstanceSuffixes'))]"
+      },
+      "type": "Microsoft.HybridCompute/machines/extensions",
+      "apiVersion": "2023-03-15-preview",
+      "name": "[format('{0}{1}/azmonitor', parameters('vmPrefix'), parameters('vmInstanceSuffixes')[copyIndex()])]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "publisher": "Microsoft.Azure.Monitor",
+        "type": "AzureMonitorWindowsAgent",
+        "typeHandlerVersion": "1.5",
+        "autoUpgradeMinorVersion": true
+      },
+      "dependsOn": [
+        "vmPrefix_vmInitialNumber_customscript"
+      ]
+    }
+  ],
+  "outputs": {}
+}

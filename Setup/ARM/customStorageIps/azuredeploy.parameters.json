@@ -1,0 +1,307 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "apiVersion": {
+            "value": "2024-04-01"
+        },
+        "deploymentMode": {
+            "value": "Validate"
+        },
+        "keyVaultName": {
+            "value": "hci..."
+        },
+        "softDeleteRetentionDays": {
+            "value": 30
+        },
+        "diagnosticStorageAccountName": {
+            "value": "sa....."
+        },
+        "logsRetentionInDays": {
+            "value": 30
+        },
+        "storageAccountType": {
+            "value": "Standard_LRS"
+        },
+        "clusterName": {
+            "value": "hcinested"
+        },
+        "location": {
+            "value": "westeurope"
+        },
+        "tenantId": {
+            "value": "..."
+        },
+         "witnessType": {
+            "value": "Cloud"
+        },
+        "clusterWitnessStorageAccountName": {
+            "value": "sa....."
+        },
+        "localAdminUserName": {
+            "value": "asLocalAdmin"
+        },
+        "localAdminPassword": {
+            "value": ""
+        },
+        "AzureStackLCMAdminUsername": {
+            "value": "asLCMUser"
+        },
+        "AzureStackLCMAdminPasssword": {
+            "value": ""
+        },
+        "arbDeploymentAppID": {
+            "value": "..."
+        },
+        "arbDeploymentAppSecret": {
+            "value": "..."
+        },
+        "arbDeploymentSPNObjectID": {
+            "value": "..."
+        },
+        "hciResourceProviderObjectID": {
+            "value": "..."
+        },
+        "arcNodeResourceIds": {
+            "value": [
+                "/subscriptions/YOURSubscription/resourceGroups/YOURresourcegroup/providers/Microsoft.HybridCompute/machines/YOURnode1",
+                "/subscriptions/YOURSubscription/resourceGroups/YOURresourcegroup/providers/Microsoft.HybridCompute/machines/YOURnode2"
+            ]
+        },
+        "domainFqdn": {
+            "value": "hci00.org"
+        },
+        "namingPrefix": {
+            "value": "HCI"
+        },
+        "adouPath": {
+            "value": "OU=HCI,DC=HCI00,DC=org"
+        },
+        "securityLevel": {
+            "value": "Customized"
+        },
+        "driftControlEnforced": {
+            "value": false
+        },
+        "credentialGuardEnforced": {
+            "value": false
+        },
+        "smbSigningEnforced": {
+            "value": false
+        },
+        "smbClusterEncryption": {
+            "value": false
+        },
+        "bitlockerBootVolume": {
+            "value": false
+        },
+        "bitlockerDataVolumes": {
+            "value": false
+        },
+        "wdacEnforced": {
+            "value": false
+        },
+        "streamingDataClient": {
+            "value": true
+        },
+        "euLocation": {
+            "value": true
+        },
+        "episodicDataUpload": {
+            "value": true
+        },
+        "configurationMode": {
+            "value": "Express"
+        },
+        "subnetMask": {
+            "value": "255.255.255.0"
+        },
+        "defaultGateway": {
+            "value": "192.168.0.1"
+        },
+        "startingIPAddress": {
+            "value": "192.168.0.10"
+        },
+        "endingIPAddress": {
+            "value": "192.168.0.30"
+        },
+        "dnsServers": {
+            "value": [
+                "192.168.0.1"
+            ]
+        },
+        "useDhcp": {
+            "value": false
+        },
+        "physicalNodesSettings": {
+            "value": [
+                {
+                    "name": "YOURnode1",
+                    "ipv4Address": "192.168.0.2"
+                },
+                {
+                    "name": "YOURnode2",
+                    "ipv4Address": "192.168.0.3"
+                }
+            ]
+        },
+        "networkingType": {
+            "value": "switchlessMultiServerDeployment"
+        },
+        "networkingPattern": {
+            "value": "custom"
+        },
+        "intentList": {
+            "value": [
+                {
+                    "name": "mgmt",
+                    "trafficType": [
+                        "Management"
+                    ],
+                    "adapter": [
+                        "aMGMT"
+                    ],
+                    "overrideVirtualSwitchConfiguration": false,
+                    "virtualSwitchConfigurationOverrides": {
+                        "enableIov": "",
+                        "loadBalancingAlgorithm": ""
+                    },
+                    "overrideQosPolicy": false,
+                    "qosPolicyOverrides": {
+                        "priorityValue8021Action_Cluster": "7",
+                        "priorityValue8021Action_SMB": "3",
+                        "bandwidthPercentage_SMB": "50"
+                    },
+                    "overrideAdapterProperty": true,
+                    "adapterPropertyOverrides": {
+                        "jumboPacket": "1514",
+                        "networkDirect": "Disabled",
+                        "networkDirectTechnology": ""
+                    }
+                },
+                {
+                    "name": "compute",
+                    "trafficType": [
+                        "Compute"
+                    ],
+                    "adapter": [
+                        "Comp1",
+                        "Comp2"
+                    ],
+                    "overrideVirtualSwitchConfiguration": false,
+                    "virtualSwitchConfigurationOverrides": {
+                        "enableIov": "",
+                        "loadBalancingAlgorithm": ""
+                    },
+                    "overrideQosPolicy": false,
+                    "qosPolicyOverrides": {
+                        "priorityValue8021Action_Cluster": "7",
+                        "priorityValue8021Action_SMB": "3",
+                        "bandwidthPercentage_SMB": "50"
+                    },
+                    "overrideAdapterProperty": true,
+                    "adapterPropertyOverrides": {
+                        "jumboPacket": "1514",
+                        "networkDirect": "Disabled",
+                        "networkDirectTechnology": ""
+                    }
+                },
+                {
+                    "name": "smb",
+                    "trafficType": [
+                        "Storage"
+                    ],
+                    "adapter": [
+                        "SMB1",
+                        "SMB2"
+                    ],
+                    "overrideVirtualSwitchConfiguration": false,
+                    "virtualSwitchConfigurationOverrides": {
+                        "enableIov": "",
+                        "loadBalancingAlgorithm": ""
+                    },
+                    "overrideQosPolicy": false,
+                    "qosPolicyOverrides": {
+                        "priorityValue8021Action_Cluster": "7",
+                        "priorityValue8021Action_SMB": "3",
+                        "bandwidthPercentage_SMB": "50"
+                    },
+                    "overrideAdapterProperty": true,
+                    "adapterPropertyOverrides": {
+                        "jumboPacket": "1514",
+                        "networkDirect": "Disabled",
+                        "networkDirectTechnology": ""
+                    }
+                }
+            ]
+        },
+        "storageNetworkList": {
+            "value": [
+                {
+                    "name": "StorageNetwork1",
+                    "networkAdapterName": "SMB1",
+                    "vlanId": "711",
+                    "storageAdapterIPInfo": [
+                        {
+                            "physicalNode": "YOURnode1",
+                            "ipv4Address": "10.0.1.10",
+                            "subnetMask": "255.255.255.0"
+                        },
+                        {
+                            "physicalNode": "YOURnode2",
+                            "ipv4Address": "10.0.1.11",
+                            "subnetMask": "255.255.255.0"
+                        }
+                    ]
+                },
+                {
+                    "name": "StorageNetwork2",
+                    "networkAdapterName": "SMB2",
+                    "vlanId": "712",
+                    "storageAdapterIPInfo": [
+                        {
+                            "physicalNode": "YOURnode1",
+                            "ipv4Address": "10.0.2.10",
+                            "subnetMask": "255.255.255.0"
+                        },
+                        {
+                            "physicalNode": "YOURnode2",
+                            "ipv4Address": "10.0.2.11",
+                            "subnetMask": "255.255.255.0"
+                        }
+                    ]
+                }
+            ]
+        },
+        "storageConnectivitySwitchless": {
+            "value": true
+        },
+        "enableStorageAutoIp": {
+            "value": false
+        },
+        "customLocation": {
+            "value": "hci00location"
+        },
+        "sbeVersion": {
+            "value": ""
+        },
+        "sbeFamily": {
+            "value": ""
+        },
+        "sbePublisher": {
+            "value": ""
+        },
+        "sbeManifestSource": {
+            "value": ""
+        },
+        "sbeManifestCreationDate": {
+            "value": ""
+        },
+        "partnerProperties": {
+            "value": []
+        },
+        "partnerCredentiallist": {
+            "value": []
+        }
+    }
+}

@@ -210,14 +210,14 @@ $ODTConfig = @"
 <Configuration ID="6ed8046a-e8ac-46ce-8d33-824b0bfc1e54">
   <Add OfficeClientEdition="64" Channel="Current">
     <Product ID="O365ProPlusRetail">
-      <Language ID="de-de" />
+      <Language ID="targetLanguage" />
       <ExcludeApp ID="Groove" />
     </Product>
     <Product ID="LanguagePack">
-      <Language ID="de-de" />
+      <Language ID="targetLanguage" />
     </Product>
     <Product ID="ProofingTools">
-      <Language ID="de-de" />
+      <Language ID="targetLanguage" />
     </Product>
   </Add>
   <Property Name="SharedComputerLicensing" Value="0" />
@@ -247,3 +247,5 @@ catch {
 }
 Write-Output "End Office Language Pack $(Get-Date)"
 #endregion
+
+stop-tran

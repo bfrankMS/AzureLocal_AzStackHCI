@@ -7,7 +7,7 @@ $selectedPackage = Get-AppxPackage -AllUsers | Sort-Object Name | Select-Object 
 $packageFamilyName = $selectedPackage.PackageFamilyName
 $packagemanifest = (Get-AppxPackage -AllUsers | ? PackageFamilyName -eq $packageFamilyName | Get-AppxPackageManifest)
 
-$filePath = "shell:appsFolder\$($packageFamilyName)!$($packagemanifest.Package.Applications.Application.Id)"
+$filePath = "shell:appsFolder\$($packageFamilyName)!$($packagemanifest.Package.Applications.Application.Id | Select-Object -First 1)"
 
 # find suitable logo for selected package
 $initialDirectory = "$($selectedPackage.InstallLocation)\$(split-path $(($packagemanifest | Select-Object -First 1).package.properties.logo) -Parent)"

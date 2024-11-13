@@ -23,6 +23,7 @@ $output = @"
 =============
 Filepath: $filePath
 Iconpath: $iconPath
+Application Identifier: $packageFamilyName
 =============
 "@
 

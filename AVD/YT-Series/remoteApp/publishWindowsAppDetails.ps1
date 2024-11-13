@@ -22,8 +22,10 @@ $iconPath = $OpenFileDialog.FileName
 $output = @"
 =============
 Filepath: $filePath
-Iconpath: $iconPath
+- - - -
 Application Identifier: $packageFamilyName
+- - - -
+Iconpath: $iconPath
 =============
 "@
 

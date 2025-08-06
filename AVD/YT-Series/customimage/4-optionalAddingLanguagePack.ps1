@@ -163,7 +163,7 @@ Dismount-DiskImage -InputObject $iso['mountvolume']
 $LanguageList = Get-WinUserLanguageList
 $LanguageList.Add($targetLanguage)
 Set-WinUserLanguageList $LanguageList -Force
-Set-SystemPreferredUILanguage -Language $targetLanguage
+# Set-SystemPreferredUILanguage -Language $targetLanguage   # commented out - as users reported failing ARC installations when setting to other lang.
 
 Write-Output "Finished Language Pack installation $(Get-Date)"
 #endregion

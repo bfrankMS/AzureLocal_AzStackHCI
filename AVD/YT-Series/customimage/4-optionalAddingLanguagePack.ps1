@@ -210,14 +210,14 @@ $ODTConfig = @"
 <Configuration ID="6ed8046a-e8ac-46ce-8d33-824b0bfc1e54">
   <Add OfficeClientEdition="64" Channel="Current">
     <Product ID="O365ProPlusRetail">
-      <Language ID="targetLanguage" />
+      <Language ID="$targetLanguage" />
       <ExcludeApp ID="Groove" />
     </Product>
     <Product ID="LanguagePack">
-      <Language ID="targetLanguage" />
+      <Language ID="$targetLanguage" />
     </Product>
     <Product ID="ProofingTools">
-      <Language ID="targetLanguage" />
+      <Language ID="$targetLanguage" />
     </Product>
   </Add>
   <Property Name="SharedComputerLicensing" Value="0" />

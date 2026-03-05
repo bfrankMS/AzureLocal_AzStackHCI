@@ -25,15 +25,15 @@ $ProgressPreference = 'SilentlyContinue'
 $myjobs = @() 
 
 #https://learn.microsoft.com/en-us/azure/virtual-desktop/windows-11-language-packs
+
 $LPdownloads = @{
-    'LanguagePack' = "https://software-static.download.prss.microsoft.com/dbazure/888969d5-f34g-4e03-ac9d-1f9786c66749/26100.1.240331-1435.ge_release_amd64fre_CLIENT_LOF_PACKAGES_OEM.iso" #24h2
+    'LanguagePack' = "https://software-static.download.prss.microsoft.com/dbazure/888969d5-f34g-4e03-ac9d-1f9786c66749/26100.1.240331-1435.ge_release_amd64fre_CLIENT_LOF_PACKAGES_OEM.iso" #24h2 + 25h2
     #"https://software-static.download.prss.microsoft.com/dbazure/988969d5-f34g-4e03-ac9d-1f9786c66749/22621.1.220506-1250.ni_release_amd64fre_CLIENT_LOF_PACKAGES_OEM.iso"# Win11 22H2, 23H2
-    'InboxApps'    = "https://software-static.download.prss.microsoft.com/dbazure/888969d5-f34g-4e03-ac9d-1f9786c66749/26100.1742.240904-1906.ge_release_svc_prod1_amd64fre_InboxApps.iso"  #24h2
+    'InboxApps'    = "https://software-static.download.prss.microsoft.com/dbazure/888969d5-f34g-4e03-ac9d-1f9786c66749/26100.6584.250904-1728.ge_release_svc_prod1_amd64fre_InboxApps.iso" #24h2 und 25h2
     #"https://software-static.download.prss.microsoft.com/dbazure/888969d5-f34g-4e03-ac9d-1f9786c66749/22621.2501.231009-1937.ni_release_svc_prod3_amd64fre_InboxApps.iso" # Win11 22H2 , 23H2
-    'ODT'          = "https://download.microsoft.com/download/2/7/A/27AF1BE6-DD20-4CB4-B154-EBAB8A7D4A7E/officedeploymenttool_18129-20030.exe"
+    'ODT'          = "https://download.microsoft.com/download/6c1eeb25-cf8b-41d9-8d0d-cc1dbc032140/officedeploymenttool_19628-20192.exe"
     #"https://download.microsoft.com/download/2/7/A/27AF1BE6-DD20-4CB4-B154-EBAB8A7D4A7E/officedeploymenttool_17531-20046.exe" #Office Deployment Tool->  https://www.microsoft.com/en-us/download/details.aspx?id=49117
-    
-}
+}  
 
 Write-Output "Starting download jobs $(Get-Date)"
 foreach ($download in $LPdownloads.GetEnumerator()) {
